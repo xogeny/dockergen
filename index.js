@@ -8,7 +8,7 @@ let pkgjson = path.join(fs.realpathSync(process.cwd()), "package.json");
 
 let pkg = require(pkgjson);
 
-const exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
 
 let template = require('./template').template
 
@@ -134,22 +134,37 @@ yargs
             let token = process.env["NPM_TOKEN"]
             let name = argv.name;
 
-            let cmd = `docker build -t ${name} .`;
+            let args = ['build', '-t', name, '.'];
             if (token) {
-                let cmd = `docker build --build-arg NPM_TOKEN=${token} -t ${name} .`;
+                args = ['build', '--build-arg', 'NPM_TOKEN='+token,
+                            '-t', name, '.'];
             }
+
+            let cmd = argv.docker+" "+args.join(" ");
             if (argv.dryrun) {
-                console.log("Build command: '"+cmd+"'");
+                console.log("Build details...");
+                console.log("  command: '"+cmd+"'");
+                console.log("  token: ", token);
             } else {
                 console.log("Running '"+cmd+"'...");
-                exec(cmd, (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`exec error: ${error}`);
-                        return;
+
+                let s = spawn(argv.docker, args);
+
+                s.stdout.on('data', (data) => {
+                    console.log(data);
+                });
+
+                s.stderr.on('data', (data) => {
+                    console.error(data);
+                });
+
+                s.on('close', (code) => {
+                    if (code==0) {
+                        console.log("Build successful!");
+                    } else {
+                        console.error("Build failed!");
                     }
-                    console.log(`stdout: ${stdout}`);
-                    console.log(`stderr: ${stderr}`);
-                    console.log("Build successful");
+                    process.exit(code);
                 });
             }
         },
@@ -166,11 +181,19 @@ yargs
                     }
                 })
                 .options({
-                    'd': {
+                    'k': {
                         alias: 'dryrun',
                         default: false,
                         describe: 'Perform a dryrun build',
-                        type: 'boolean',
+                        type: 'boolean'
+                    }
+                })
+                .options({
+                    'd': {
+                        alias: 'docker',
+                        default: "docker",
+                        describe: "Docker command",
+                        type: 'string'
                     }
                 })
                 .help()
