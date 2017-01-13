@@ -1,6 +1,6 @@
 {
     "name": "dockergen",
-    "version": "0.1.13",
+    "version": "0.2.0",
     "description": "Generate a Dockerfile for any NodeJS application",
     "main": "index.js",
     "scripts": {
@@ -13,15 +13,6 @@
     "author": "Michael M. Tiller",
     "bin": {
         "dockergen": "index.js"
-    },
-    "dockergen": {
-        "env": {
-            "FOO": "BAR"
-        },
-        "scope": "@xogeny",
-        "expose": [3000],
-        "script": ["compile"],
-        "runcmd": "prestart"
     },
     "license": "MIT",
     "dependencies": {
