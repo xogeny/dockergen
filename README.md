@@ -7,6 +7,7 @@ images associated with those `Dockerfile`s.
   - Generates `Dockerfile` based on a template with many configuration options.
   - Configuration can be controlled directly by options in `package.json`.
   - Support for "scopes" and private repositories.
+  - Support for `yarn` and using `yarn.lock` for deterministic deployments.
 
 # Installation
 
