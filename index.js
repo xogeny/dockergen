@@ -141,14 +141,15 @@ yargs
             if (argv.dryrun) {
                 console.log("Build command: '"+cmd+"'");
             } else {
-                exec(cmd, (err, stdout, stderr) => {
+                exec(cmd, (error, stdout, stderr) => {
+                    console.log("Running '"+cmd+"'...");
                     if (error) {
                         console.error(`exec error: ${error}`);
                         return;
                     }
                     console.log(`stdout: ${stdout}`);
                     console.log(`stderr: ${stderr}`);
-                    console.log("Ran '"+cmd+"' successfully");
+                    console.log("Build successful");
                 });
             }
         },
