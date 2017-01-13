@@ -151,11 +151,11 @@ yargs
                 let s = spawn(argv.docker, args);
 
                 s.stdout.on('data', (data) => {
-                    console.log(data.toString());
+                    process.stdout.write(data);
                 });
 
                 s.stderr.on('data', (data) => {
-                    console.error(data.toString());
+                    process.stderr.write(data);
                 });
 
                 s.on('close', (code) => {
