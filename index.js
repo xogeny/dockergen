@@ -49,12 +49,14 @@ function envCommands(argv) {
 
 function npmFileCommands(argv) {
     let scope = argv["scope"];
-    if (!scope) return "";
+    if (!scope) {
+        let ret = "RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc\n\n"
+    }
     
     if (!scope.startsWith("@")) {
         scope = "@"+scope
     }
-    let ret = "RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc\n\n"
+    
     if (scope) {
         ret = ret + "# User specified scope of "+scope+"\n"
         ret = ret + "RUN echo 'scope="+scope+"' >> .npmrc\n"
