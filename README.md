@@ -1,5 +1,3 @@
-# `dockergen` - A utility for generating Dockerfiles for Node projects
-
 The goal of this project is to create a simple Node package that is capable
 of creating customized `Dockerfile`s for Node projects and building the 
 images associated with those `Dockerfile`s.
@@ -101,6 +99,10 @@ found in `package.json`.
 
 ## Use with `sdocker`
 
-Note that `dockergen build` includes a command line option `--docker`.  This allows you to use
-an alternative program as the Docker client.  For example, you can substitute `sdocker` ([an
-alternative client that supports SSH tunneling](https://github.com/xogeny/sdocker)) using this option.
+Note that `dockergen build` includes a command line option `--docker`.
+This allows you to use an alternative program as the Docker client.
+For example, you can substitute `sdocker`
+([an alternative client that supports SSH tunneling](https://github.com/xogeny/sdocker))
+using this option.  This allows you to avoid the complication of
+using TLS certificates for secure use of Docker and instead rely on
+SSH keys.
