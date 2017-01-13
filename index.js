@@ -107,11 +107,50 @@ yargs
     .command({
         command: "build",
         handler: (argv) => {
+            let gitignore = path.join(process.cwd(), ".gitignore");
+            let npmignore = path.join(process.cwd(), ".npmignore");
+            let dignore = fs.existsSync(path.join(process.cwd(), ".dockerignore"));
+            let gignore = fs.existsSync(gitignore);
+            let nignore = fs.existsSync(npmignore);
+            let git = fs.existsSync(path.join(process.cwd(), ".git"));
+
+            if (!dignore && (git || gignore || nignore)) {
+                console.warn("WARNING, no .dockerignore file found!");
+                console.warn("We strongly advise that you create a .dockerignore");
+                console.warn("file and include the following:");
+                console.warn("");
+                console.warn(".git");
+                if (nignore) {
+                    console.warn(fs.readFileSync(npmignore).toString());
+                } else {
+                    if (gignore) {
+                        console.warn(fs.readFileSync(gitignore).toString());
+                    } else {
+                        console.warn("node_modules");
+                    }
+                }
+            }
+
             let token = process.env["NPM_TOKEN"]
             let name = argv.name;
-            let cmd = `docker build --build-arg NPM_TOKEN=${token} -t ${name} .`;
-            exec(cmd);
-            console.log("Ran '"+cmd+"' successfully");
+
+            let cmd = `docker build -t ${name} .`;
+            if (token) {
+                let cmd = `docker build --build-arg NPM_TOKEN=${token} -t ${name} .`;
+            }
+            if (argv.dryrun) {
+                console.log("Build command: '"+cmd+"'");
+            } else {
+                exec(cmd, (err, stdout, stderr) => {
+                    if (error) {
+                        console.error(`exec error: ${error}`);
+                        return;
+                    }
+                    console.log(`stdout: ${stdout}`);
+                    console.log(`stderr: ${stderr}`);
+                    console.log("Ran '"+cmd+"' successfully");
+                });
+            }
         },
         desc: 'Generate a Dockerfile',
         builder: (yargs) => {
@@ -123,6 +162,14 @@ yargs
                         default: defaults.name,
                         describe: 'Name to give image being built',
                         type: 'string'
+                    }
+                })
+                .options({
+                    'd': {
+                        alias: 'dryrun',
+                        default: false,
+                        describe: 'Perform a dryrun build',
+                        type: 'boolean',
                     }
                 })
                 .help()
