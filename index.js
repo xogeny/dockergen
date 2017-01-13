@@ -141,8 +141,8 @@ yargs
             if (argv.dryrun) {
                 console.log("Build command: '"+cmd+"'");
             } else {
+                console.log("Running '"+cmd+"'...");
                 exec(cmd, (error, stdout, stderr) => {
-                    console.log("Running '"+cmd+"'...");
                     if (error) {
                         console.error(`exec error: ${error}`);
                         return;
