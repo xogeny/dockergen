@@ -84,7 +84,7 @@ function generate(argv) {
 }
 
 function defaultValue(key, def) {
-    if (pkg && pkg.dockergen && pkg.dockergen[key]) {
+    if (pkg && pkg.dockergen && pkg.dockergen.hasOwnProperty(key)) {
         let val = pkg.dockergen[key];
         if (key=="env") {
             val = Object.keys(val).map((key) => `${key}=${val[key]}`)
