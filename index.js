@@ -1,8 +1,23 @@
+let pkg = require('./package.json');
 let yargs = require('yargs');
+let fs = require('fs');
+let process = require('process');
+
+const exec = require('child_process').exec;
+
+let template = require('./template').template
 
 function scriptCommands(argv) {
-    let scripts = argv.scripts;
+    let scripts = argv.script || [];
     let test = argv.test;
+
+    if (test && scripts.indexOf("test")==-1) {
+        scripts.push("test");
+    }
+
+    return "# NPM Scripts to run *during build*\n" + scripts.map((script) => {
+        return `RUN npm run ${script}`
+    }).join("\n");
 }
 
 function exposeCommands(argv) {
@@ -22,7 +37,7 @@ function envCommands(argv) {
         if (parts.length!=2) {
             throw new Error("Environment variables must be of the form NAME=VALUE")
         }
-        return "ENV "+parts[0]+" "+parts[1]
+        return `ENV ${parts[0]} ${parts[1]}`
     }).join("\n")
     return ret;
 }
@@ -43,82 +58,156 @@ function npmFileCommands(argv) {
     return ret;
 }
 
-function template(image, npmfile, envs, exps) {
-  return `
-# Base image
-FROM ${image}
-
-# Install yarn
-# N.B. - We don't use the preferred method because it has to be implemented 
-# differently on different platforms (depending on whether sudo is preset)
-RUN npm install --global yarn
-
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-# Install app dependencies
-ARG NPM_TOKEN
-${npmfile}
-COPY . /usr/src/app
-
-# Install dependencies using Yarn
-RUN yarn install 
-
-# Now get rid of the embedded "secret" used to access private repositories
-RUN rm -f .npmrc
-
-${envs}
-
-${exps}
-
-# Run tests to make sure everything got installed correctly
-RUN npm test
-
-CMD [ "npm", "start" ]
-`    
-}
-
 function generate(argv) {
     let npmfile = npmFileCommands(argv);
     let image = argv.image;
     let envs = envCommands(argv);
     let exps = exposeCommands(argv);
-    let output = template(image, npmfile, envs, exps);
-    console.log(output);
+    let scripts = scriptCommands(argv);
+    let output = template(image, npmfile, envs, exps, scripts, argv.runcmd);
+
+    if (fs.existsSync("Dockerfile") && !argv.overwrite) {
+        console.error("Dockerfile already exists, use --overwrite to overwrite it")
+        process.exit(1);
+    } else {
+        fs.writeFileSync("Dockerfile", output);
+        console.log("Dockerfile written");
+    }
+}
+
+function defaultValue(key, def) {
+    if (pkg && pkg.dockergen && pkg.dockergen[key]) {
+        let val = pkg.dockergen[key];
+        if (key=="env") {
+            val = Object.keys(val).map((key) => `${key}=${val[key]}`)
+        }
+        return val
+    }
+    return def;
+}
+
+const defaults = {
+    "image": defaultValue("image", "node:latest"),
+    "env": defaultValue("env", []),
+    "expose": defaultValue("expose", []),
+    "script": defaultValue("script", []),
+    "scope": defaultValue("scope", null),
+    "test": defaultValue("test", true),
+    "overwrite": defaultValue("overwrite", false),
+    "runcmd": defaultValue("runcmd", "start"),
+    "name": defaultValue("name", null),
 }
 
 yargs
+    .command({
+        command: "build",
+        handler: (argv) => {
+            let token = process.env["NPM_TOKEN"]
+            let name = argv.name;
+            let cmd = `docker build --build-arg NPM_TOKEN=${token} -t ${name} .`;
+            exec(cmd);
+            console.log("Ran '"+cmd+"' successfully");
+        },
+        desc: 'Generate a Dockerfile',
+        builder: (yargs) => {
+            yargs
+                .options({
+                    'n': {
+                        alias: 'name',
+                        demand: true,
+                        default: defaults.name,
+                        describe: 'Name to give image being built',
+                        type: 'string'
+                    }
+                })
+                .help()
+        },
+    })
     .command({
         command: 'generate',
         aliases: ['gen'],
         desc: 'Generate a Dockerfile',
         builder: (yargs) => {
             yargs
-                .describe('image', "Base Docker image")
-                .default('image', "node:latest")
-                .describe('env', "Settable environment variables (NAME=VAL)")
-                .array('env')
-                .describe('expose', "Ports to EXPOSE")
-                .array('expose')
-                .describe('scripts', "Scripts to run during build")
-                .array('scripts')
-                .describe('scope', "Scope to use for repos")
-                .default('scope', null)
-                .describe('test', "Run tests during build")
-                .default('test', true)
-                .describe('production', "Run in production mode")
-                .default('production', true)
-                .describe('runcmd', "NPM script to run application")
-                .default('runcmd', "start")
+                .options({
+                    'i': {
+                        alias: 'image',
+                        demand: false,
+                        default: defaults.image,
+                        describe: 'Base Docker image',
+                        type: 'string'
+                    }
+                })
+                .options({
+                    'e': {
+                        alias: 'env',
+                        demand: false,
+                        default: defaults.env,
+                        describe: 'Settable environment variables (NAME=VAL)',
+                        type: 'array'
+                    }
+                })
+                .options({
+                    'x': {
+                        alias: 'expose',
+                        demand: false,
+                        default: defaults.expose,
+                        describe: 'Ports to EXPOSE',
+                        type: 'array'
+                    }
+                })
+                .options({
+                    's': {
+                        alias: 'script',
+                        demand: false,
+                        default: defaults.script,
+                        describe: 'Scripts to run during build',
+                        type: 'array'
+                    }
+                })
+                .options({
+                    'c': {
+                        alias: 'scope',
+                        demand: false,
+                        default: defaults.scope,
+                        describe: 'Scope to use for repos',
+                        type: 'string'
+                    }
+                })
+                .options({
+                    'o': {
+                        alias: 'overwrite',
+                        demand: false,
+                        default: defaults.overwrite,
+                        describe: 'Overwrite existing Dockerfile',
+                        type: 'boolean'
+                    }
+                })
+                .options({
+                    't': {
+                        alias: 'test',
+                        demand: false,
+                        default: defaults.test,
+                        describe: 'Run tests during build',
+                        type: 'boolean'
+                    }
+                })
+                .options({
+                    'r': {
+                        alias: 'runcmd',
+                        demand: false,
+                        default: defaults.runcmd,
+                        describe: 'NPM script to launch application',
+                        type: 'string'
+                    }
+                })
                 .help()
         },
         handler: (argv) => {
-            console.log("argv = ", argv);
             generate(argv);
         }
     })
-    // provide a minimum demand and a minimum demand message 
+// provide a minimum demand and a minimum demand message 
     .demandCommand(1, 'You need at least one command before moving on')
     .help()
     .argv
