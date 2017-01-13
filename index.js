@@ -1,7 +1,12 @@
-let pkg = require('./package.json');
+#! /usr/bin/env node
 let yargs = require('yargs');
 let fs = require('fs');
 let process = require('process');
+let path = require('path');
+
+let pkgjson = path.join(fs.realpathSync(process.cwd()), "package.json");
+
+let pkg = require(pkgjson);
 
 const exec = require('child_process').exec;
 
