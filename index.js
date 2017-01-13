@@ -49,8 +49,9 @@ function envCommands(argv) {
 
 function npmFileCommands(argv) {
     let scope = argv["scope"];
+    let ret = "RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc\n";
     if (!scope) {
-        return "RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc\n"
+        return ret;
     }
     
     if (!scope.startsWith("@")) {
