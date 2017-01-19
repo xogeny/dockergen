@@ -6,12 +6,15 @@ let path = require('path');
 
 let build = require('./build');
 let gen = require('./gen');
+let ecs = require('./ecs');
 
 const spawn = require('child_process').spawn;
 
 build.addBuildCommand(yargs);
 
 gen.addGenCommand(yargs);
+
+ecs.addPushCommand(yargs);
 
 // provide a minimum demand and a minimum demand message 
 yargs

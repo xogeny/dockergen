@@ -28,6 +28,7 @@ function configDefaults() {
         "overwrite": defaultValue("overwrite", false),
         "runcmd": defaultValue("runcmd", "start"),
         "name": defaultValue("name", null),
+        "ecr": defaultValue("ecr", null),
     }
 }
 
