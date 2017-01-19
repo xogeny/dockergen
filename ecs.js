@@ -41,20 +41,20 @@ function addPushCommand(yargs) {
                         }
                     })
                     .options({
-                        'k': {
-                            alias: 'dryrun',
-                            default: false,
-                            describe: 'Perform a dryrun generation (output to standard out)',
-                            type: 'boolean'
-                        }
-                    })
-                    .options({
-                        'r': {
+                        't': {
                             alias: 'ecr',
                             demand: true,
                             default: "latest",
                             describe: 'Remote tag',
                             type: 'string'
+                        }
+                    })
+                    .options({
+                        'k': {
+                            alias: 'dryrun',
+                            default: false,
+                            describe: 'Perform a dryrun generation (output to standard out)',
+                            type: 'boolean'
                         }
                     })
             },
@@ -73,14 +73,16 @@ function addPushCommand(yargs) {
                     console.log("docker " + args1.join(" "));
                     console.log("docker " + args2.join(" "));
                 } else {
+                    console.log("Running 'docker " + args1.join(" ") + "'");
                     runcmd.runcmd('docker', args1).then((v) => {
+                        console.log("Running 'docker " + args2.join(" ") + "'");
                         runcmd.runcmd('docker', args2).then((x) => {
                             console.log("Image successfully pushed to " + remote);
                         }, (e) => {
                             console.log("Push command, 'docker " + args2.join(" ") + "', failed");
                         })
                     }, (e) => {
-                        console.log("Tag ommand, 'docker " + args1.join(" ") + "', failed");
+                        console.log("Tag command, 'docker " + args1.join(" ") + "', failed");
                     })
                 }
             }
