@@ -42,7 +42,7 @@ function addPushCommand(yargs) {
                     })
                     .options({
                         't': {
-                            alias: 'ecr',
+                            alias: 'to',
                             demand: true,
                             default: "latest",
                             describe: 'Remote tag',
