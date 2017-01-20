@@ -1,6 +1,6 @@
 {
     "name": "dockergen",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "description": "Generate a Dockerfile for any NodeJS application",
     "main": "index.js",
     "scripts": {

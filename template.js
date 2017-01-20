@@ -29,7 +29,7 @@ ${exps}
 
 ${scripts}
 
-CMD [ "npm", "${runcmd}" ]
+CMD [ "npm", "run", ${runcmd}" ]
 `    
 }
 
