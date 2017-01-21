@@ -79,10 +79,10 @@ function addPushCommand(yargs) {
                         runcmd.runcmd('docker', args2).then((x) => {
                             console.log("Image successfully pushed to " + remote);
                         }, (e) => {
-                            console.log("Push command, 'docker " + args2.join(" ") + "', failed");
+                            console.error("Push command, 'docker " + args2.join(" ") + "', failed");
                         })
                     }, (e) => {
-                        console.log("Tag command, 'docker " + args1.join(" ") + "', failed");
+                        console.error("Tag command, 'docker " + args1.join(" ") + "', failed");
                     })
                 }
             }
