@@ -11,9 +11,12 @@
     "docker",
     "node"
   ],
+  "files": [
+    "lib/**/*"
+  ],
   "author": "Michael M. Tiller",
   "bin": {
-    "dockergen": "index.js"
+    "dockergen": "lib/index.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +27,8 @@
     "yargs": "^6.6.0"
   },
   "devDependencies": {
+    "@types/node": "^12.0.10",
+    "@types/yargs": "^13.0.0",
     "typescript": "^3.5.2"
   }
 }

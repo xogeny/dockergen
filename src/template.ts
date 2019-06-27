@@ -1,4 +1,11 @@
-function template(image, npmfile, envs, exps, scripts, runcmd) {
+export function template(
+  image: string,
+  npmfile: string,
+  envs: string,
+  exps: string,
+  scripts: string,
+  runcmd: string
+) {
   return `
 # Base image
 FROM ${image}
@@ -30,9 +37,5 @@ ${exps}
 ${scripts}
 
 CMD [ "npm", "run", "${runcmd}" ]
-`    
-}
-
-module.exports = {
-  "template": template
+`;
 }

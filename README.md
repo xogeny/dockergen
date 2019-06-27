@@ -46,7 +46,7 @@ Normally, one would use `docker build -t <NAME> .` to build a docker
 image from an existing Dockerfile.  But because we want to supporting
 building using private repositories AND doing so as part of the
 **build process** (as opposed to installing Node packages when the
-container is start), we need to add some build arguments.  The typical
+container is started), we need to add some build arguments.  The typical
 build command would look something like:
 
 ```
@@ -104,6 +104,11 @@ object in `package.json` but as an array of strings of the form
 values from `package.json`, simply run `dockergen gen --help`.  The
 default values shown by `--help` include any values found in
 `package.json`.
+
+## USe with `npx`
+
+If you don't want to add `dockergen` as a dependency, you can invoke it using
+`npx` as well, e.g., `npx dockergen ...`.
 
 ## Use with `sdocker`
 
