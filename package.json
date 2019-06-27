@@ -1,25 +1,29 @@
 {
-    "name": "dockergen",
-    "version": "0.3.6",
-    "description": "Generate a Dockerfile for any NodeJS application",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [
-        "docker",
-        "node"
-    ],
-    "author": "Michael M. Tiller",
-    "bin": {
-        "dockergen": "index.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/xogeny/dockergen.git"
-    },
-    "license": "MIT",
-    "dependencies": {
-        "yargs": "^6.6.0"
-    }
+  "name": "dockergen",
+  "version": "1.0.0-rc1",
+  "description": "Generate a Dockerfile for any NodeJS application",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "docker",
+    "node"
+  ],
+  "author": "Michael M. Tiller",
+  "bin": {
+    "dockergen": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xogeny/dockergen.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "yargs": "^6.6.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.5.2"
+  }
 }
