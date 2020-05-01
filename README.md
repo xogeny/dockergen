@@ -1,3 +1,5 @@
+  **This is old work that I no longer maintain.  Furthermore, it is now much easier to do this sort of thing with `docker build`.  See [this article](https://medium.com/@mtiller/building-docker-images-simply-and-securely-using-private-npm-registries-2c9f6694737b) for a better way.**
+
 The goal of this project is to create a simple Node package that is capable
 of creating customized `Dockerfile`s for Node projects and building the 
 images associated with those `Dockerfile`s.
